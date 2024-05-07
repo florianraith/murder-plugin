@@ -1,7 +1,7 @@
 package com.florianraith.murder.command;
 
 import com.florianraith.murder.MurderPlugin;
-import com.florianraith.murder.state.*;
+import com.florianraith.murder.phase.*;
 import com.google.inject.Inject;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -34,7 +34,7 @@ public class SwitchPhaseCommand implements CommandExecutor {
             return false;
         }
 
-        plugin.switchWorldState(phase);
+        plugin.setPhase(phase);
         return false;
     }
 }

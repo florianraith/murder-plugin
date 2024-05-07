@@ -1,4 +1,4 @@
-package com.florianraith.murder.state;
+package com.florianraith.murder.phase;
 
 import com.florianraith.murder.MurderPlugin;
 import com.florianraith.murder.PlayerRole;
@@ -49,13 +49,13 @@ public class GamePhase extends WorldPhase {
         if (murderers.isEmpty()) {
             Bukkit.broadcastMessage("The murderer has left the game.");
             Bukkit.broadcastMessage("");
-            plugin.switchWorldState(EndPhase.class);
+            plugin.setPhase(EndPhase.class);
         }
 
         if (bystanders.isEmpty()) {
             Bukkit.broadcastMessage("The last bystander has left the game.");
             Bukkit.broadcastMessage("");
-            plugin.switchWorldState(EndPhase.class);
+            plugin.setPhase(EndPhase.class);
         }
     }
 

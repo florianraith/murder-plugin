@@ -1,4 +1,4 @@
-package com.florianraith.murder.state;
+package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
 import com.florianraith.murder.MurderPlugin;
@@ -15,7 +15,7 @@ public class EndPhase extends WorldPhase {
 
     @Override
     public void onEnable() {
-        countdown = new Countdown(plugin, () -> plugin.switchWorldState(LobbyPhase.class), 5);
+        countdown = new Countdown(plugin, () -> plugin.setPhase(LobbyPhase.class), 5);
         countdown.setMessage("A new round starts in %s");
         countdown.start();
     }

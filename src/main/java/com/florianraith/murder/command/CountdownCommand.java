@@ -2,7 +2,7 @@ package com.florianraith.murder.command;
 
 import com.florianraith.murder.Countdown;
 import com.florianraith.murder.MurderPlugin;
-import com.florianraith.murder.state.LobbyPhase;
+import com.florianraith.murder.phase.LobbyPhase;
 import com.google.inject.Inject;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -16,7 +16,7 @@ public class CountdownCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, String label, String[] args) {
-        if (!(plugin.getCurrentWorldPhase() instanceof LobbyPhase lobby)) {
+        if (!(plugin.getCurrentPhase() instanceof LobbyPhase lobby)) {
             sender.sendMessage("The countdown is only accessible during lobby phase");
             return false;
         }

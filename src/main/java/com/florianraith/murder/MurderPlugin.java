@@ -3,8 +3,8 @@ package com.florianraith.murder;
 import com.florianraith.murder.command.CommandExecutor;
 import com.florianraith.murder.command.CountdownCommand;
 import com.florianraith.murder.command.SwitchPhaseCommand;
-import com.florianraith.murder.state.LobbyPhase;
-import com.florianraith.murder.state.WorldPhase;
+import com.florianraith.murder.phase.LobbyPhase;
+import com.florianraith.murder.phase.WorldPhase;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.Getter;
@@ -27,7 +27,7 @@ import java.util.Objects;
 public class MurderPlugin extends JavaPlugin {
 
     private Injector injector;
-    private WorldPhase currentWorldPhase;
+    private WorldPhase currentPhase;
     private World gameWorld;
 
     @Override
@@ -41,26 +41,26 @@ public class MurderPlugin extends JavaPlugin {
 
         registerEvents(WorldListener.class);
 
-        switchWorldState(LobbyPhase.class);
+        setPhase(LobbyPhase.class);
     }
 
     @Override
     public void onDisable() {
-        if (currentWorldPhase != null) {
-            currentWorldPhase.onDisable();
+        if (currentPhase != null) {
+            currentPhase.onDisable();
         }
     }
 
-    public void switchWorldState(Class<? extends WorldPhase> worldStateClass) {
-        WorldPhase state = injector.getInstance(worldStateClass);
+    public void setPhase(Class<? extends WorldPhase> phaseClass) {
+        WorldPhase phase = injector.getInstance(phaseClass);
 
-        if (currentWorldPhase != null) {
-            currentWorldPhase.onDisable();
+        if (currentPhase != null) {
+            currentPhase.onDisable();
         }
 
-        Bukkit.getOnlinePlayers().forEach(state::preparePlayer);
-        state.onEnable();
-        currentWorldPhase = state;
+        Bukkit.getOnlinePlayers().forEach(phase::preparePlayer);
+        phase.onEnable();
+        currentPhase = phase;
     }
 
     public World getGameWorld() {

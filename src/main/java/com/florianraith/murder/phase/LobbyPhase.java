@@ -1,4 +1,4 @@
-package com.florianraith.murder.state;
+package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
 import com.florianraith.murder.MurderPlugin;
@@ -22,7 +22,7 @@ public class LobbyPhase extends WorldPhase {
 
     @Override
     public void onEnable() {
-        countdown = new Countdown(plugin, () -> plugin.switchWorldState(PreGamePhase.class), 15);
+        countdown = new Countdown(plugin, () -> plugin.setPhase(PreGamePhase.class), 15);
         countdown.setMessage("The game starts in %s");
         Bukkit.getOnlinePlayers().forEach(this::onJoin);
     }

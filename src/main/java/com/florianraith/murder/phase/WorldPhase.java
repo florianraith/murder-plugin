@@ -1,4 +1,4 @@
-package com.florianraith.murder.state;
+package com.florianraith.murder.phase;
 
 import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;

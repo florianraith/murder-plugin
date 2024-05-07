@@ -1,6 +1,6 @@
 package com.florianraith.murder;
 
-import com.florianraith.murder.state.WorldPhase;
+import com.florianraith.murder.phase.WorldPhase;
 import com.google.inject.Inject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +19,7 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        WorldPhase worldPhase = plugin.getCurrentWorldPhase();
+        WorldPhase worldPhase = plugin.getCurrentPhase();
         Player player = event.getPlayer();
 
         event.setJoinMessage("");
@@ -30,7 +30,7 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
         event.setQuitMessage("");
-        plugin.getCurrentWorldPhase().onQuit(event.getPlayer());
+        plugin.getCurrentPhase().onQuit(event.getPlayer());
     }
 
     @EventHandler
