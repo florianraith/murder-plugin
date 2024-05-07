@@ -1,8 +1,8 @@
 package com.florianraith.murder;
 
 import com.florianraith.murder.command.CommandExecutor;
-import com.florianraith.murder.command.SwitchGameCommand;
-import com.florianraith.murder.command.SwitchLobbyCommand;
+import com.florianraith.murder.command.CountdownCommand;
+import com.florianraith.murder.command.SwitchPhaseCommand;
 import com.florianraith.murder.state.LobbyPhase;
 import com.florianraith.murder.state.WorldPhase;
 import com.google.inject.Guice;
@@ -36,8 +36,8 @@ public class MurderPlugin extends JavaPlugin {
         injector = Guice.createInjector(module);
         injector.injectMembers(this);
 
-        registerCommands(SwitchGameCommand.class);
-        registerCommands(SwitchLobbyCommand.class);
+        registerCommand(SwitchPhaseCommand.class);
+        registerCommand(CountdownCommand.class);
 
         registerEvents(WorldListener.class);
 
@@ -74,7 +74,7 @@ public class MurderPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(injector.getInstance(listenerClass), this);
     }
 
-    private void registerCommands(Class<? extends CommandExecutor> commandClass) {
+    private void registerCommand(Class<? extends CommandExecutor> commandClass) {
         try {
             Field nameField = commandClass.getField("NAME");
             String name = (String) nameField.get(null);

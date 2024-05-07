@@ -3,6 +3,7 @@ package com.florianraith.murder.state;
 import com.florianraith.murder.Countdown;
 import com.florianraith.murder.MurderPlugin;
 import com.google.inject.Inject;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -13,7 +14,7 @@ public class LobbyPhase extends WorldPhase {
 
     @Inject private MurderPlugin plugin;
     private final World world;
-    private Countdown countdown;
+    @Getter private Countdown countdown;
 
     public LobbyPhase() {
         this.world = Bukkit.getWorld("lobby");
