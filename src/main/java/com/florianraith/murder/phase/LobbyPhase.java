@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class LobbyPhase extends WorldPhase {
+public class LobbyPhase implements WorldPhase {
 
     public static final int MIN_PLAYERS = 2;
 

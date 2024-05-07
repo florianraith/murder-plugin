@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class GamePhase extends WorldPhase {
+public class GamePhase implements WorldPhase {
 
     @Inject private MurderPlugin plugin;
     @Inject private World world;

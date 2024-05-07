@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class EndPhase extends WorldPhase {
+public class EndPhase implements WorldPhase {
 
     @Inject private MurderPlugin plugin;
     @Inject private World world;

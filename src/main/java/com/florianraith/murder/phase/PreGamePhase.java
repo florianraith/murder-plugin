@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class PreGamePhase extends WorldPhase {
+public class PreGamePhase implements WorldPhase {
 
     @Inject private MurderPlugin plugin;
     @Inject private World world;
