@@ -22,7 +22,7 @@ public class LobbyPhase implements WorldPhase {
 
     @Override
     public void onEnable() {
-        countdown = new Countdown(plugin, () -> plugin.setPhase(PreGamePhase.class), 15);
+        countdown = new Countdown(plugin, () -> plugin.setPhase(PreparingPhase.class), 15);
         countdown.setMessage("The game starts in %s");
         Bukkit.getOnlinePlayers().forEach(this::onJoin);
     }
