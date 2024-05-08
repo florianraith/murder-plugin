@@ -20,6 +20,10 @@ public class Countdown {
     @Setter private String message = "Countdown ends in %s";
 
     public void start() {
+        start(this.seconds);
+    }
+
+    public void start(long seconds) {
         if (isRunning()) {
             throw new IllegalStateException("The countdown is already running");
         }

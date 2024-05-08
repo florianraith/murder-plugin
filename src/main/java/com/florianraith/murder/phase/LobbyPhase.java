@@ -1,6 +1,7 @@
 package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
+import com.florianraith.murder.Countdownable;
 import com.florianraith.murder.MurderPlugin;
 import com.florianraith.murder.item.ItemManager;
 import com.florianraith.murder.item.StartGameItem;
@@ -10,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class LobbyPhase implements WorldPhase {
+public class LobbyPhase implements WorldPhase, Countdownable {
 
     public static final int MIN_PLAYERS = 3;
 

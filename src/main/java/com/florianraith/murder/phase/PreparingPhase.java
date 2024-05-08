@@ -1,20 +1,22 @@
 package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
+import com.florianraith.murder.Countdownable;
 import com.florianraith.murder.MurderPlugin;
 import com.florianraith.murder.util.Attributes;
 import com.google.inject.Inject;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
-public class PreparingPhase implements WorldPhase {
+public class PreparingPhase implements WorldPhase, Countdownable {
 
     @Inject private MurderPlugin plugin;
     @Inject private World world;
 
-    private Countdown countdown;
+    @Getter private Countdown countdown;
 
     @Override
     public void onEnable() {
