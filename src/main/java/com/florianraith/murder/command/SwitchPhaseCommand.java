@@ -21,11 +21,11 @@ public class SwitchPhaseCommand implements CommandExecutor {
             return false;
         }
 
-        Class<? extends WorldPhase> phase = switch (args[0]) {
-            case "lobby" -> LobbyPhase.class;
-            case "preparing" -> PreparingPhase.class;
-            case "game" -> GamePhase.class;
-            case "end" -> EndPhase.class;
+        WorldPhase phase = switch (args[0]) {
+            case "lobby" -> new LobbyPhase();
+            case "preparing" -> new PreparingPhase();
+            case "game" -> new GamePhase();
+            case "end" -> new EndPhase();
             default -> null;
         };
 

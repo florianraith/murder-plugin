@@ -4,7 +4,9 @@ import com.florianraith.murder.phase.WorldPhase;
 import com.google.inject.Inject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -19,12 +21,12 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        WorldPhase worldPhase = plugin.getCurrentPhase();
+        WorldPhase currentPhase = plugin.getCurrentPhase();
         Player player = event.getPlayer();
 
         event.setJoinMessage("");
-        worldPhase.preparePlayer(player);
-        worldPhase.onJoin(player);
+        currentPhase.preparePlayer(player);
+        currentPhase.onJoin(player);
     }
 
     @EventHandler
@@ -55,6 +57,11 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEntityDamage(EntityDamageEvent event) {
         event.setCancelled(true);
     }
 

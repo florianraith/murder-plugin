@@ -41,7 +41,7 @@ public class MurderPlugin extends JavaPlugin {
 
         registerEvents(WorldListener.class);
 
-        setPhase(LobbyPhase.class);
+        setPhase(new LobbyPhase());
     }
 
     @Override
@@ -51,16 +51,16 @@ public class MurderPlugin extends JavaPlugin {
         }
     }
 
-    public void setPhase(Class<? extends WorldPhase> phaseClass) {
-        WorldPhase phase = injector.getInstance(phaseClass);
+    public void setPhase(WorldPhase phase) {
+        injector.injectMembers(phase);
 
         if (currentPhase != null) {
             currentPhase.onDisable();
         }
 
+        currentPhase = phase;
         Bukkit.getOnlinePlayers().forEach(phase::preparePlayer);
         phase.onEnable();
-        currentPhase = phase;
     }
 
     public World getGameWorld() {

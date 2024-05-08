@@ -2,6 +2,8 @@ package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
 import com.florianraith.murder.MurderPlugin;
+import com.florianraith.murder.item.ItemManager;
+import com.florianraith.murder.item.StartGameItem;
 import com.google.inject.Inject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -10,9 +12,11 @@ import org.bukkit.entity.Player;
 
 public class LobbyPhase implements WorldPhase {
 
-    public static final int MIN_PLAYERS = 2;
+    public static final int MIN_PLAYERS = 3;
 
     @Inject private MurderPlugin plugin;
+    @Inject private ItemManager itemManager;
+
     private final World world;
     @Getter private Countdown countdown;
 
@@ -22,13 +26,17 @@ public class LobbyPhase implements WorldPhase {
 
     @Override
     public void onEnable() {
-        countdown = new Countdown(plugin, () -> plugin.setPhase(PreparingPhase.class), 15);
+        itemManager.register(StartGameItem.class);
+
+        countdown = new Countdown(plugin, () -> plugin.setPhase(new PreparingPhase()), 15);
         countdown.setMessage("The game starts in %s");
+
         Bukkit.getOnlinePlayers().forEach(this::onJoin);
     }
 
     @Override
     public void onDisable() {
+        itemManager.unregisterAll();
         countdown.stop();
     }
 
@@ -39,6 +47,8 @@ public class LobbyPhase implements WorldPhase {
         if (Bukkit.getOnlinePlayers().size() >= MIN_PLAYERS && countdown.isStopped()) {
             countdown.start();
         }
+
+        player.getInventory().addItem(itemManager.get(StartGameItem.class));
     }
 
     @Override
