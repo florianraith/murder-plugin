@@ -1,6 +1,7 @@
 package com.florianraith.murder.command;
 
 import com.florianraith.murder.MurderPlugin;
+import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.phase.*;
 import com.google.inject.Inject;
 import org.bukkit.command.CommandSender;
@@ -13,11 +14,12 @@ public class SwitchPhaseCommand implements CommandExecutor {
     public static final String NAME = "phase";
 
     @Inject private MurderPlugin plugin;
+    @Inject private Messages messages;
 
     @Override
     public boolean onCommand(CommandSender sender, String label, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage("Phase must be on of ['lobby', 'preparing', 'game', 'end']");
+            sender.sendMessage(messages.prefix("Phase must be on of ['lobby', 'preparing', 'game', 'end']"));
             return false;
         }
 
@@ -30,7 +32,7 @@ public class SwitchPhaseCommand implements CommandExecutor {
         };
 
         if (phase == null) {
-            sender.sendMessage("Phase must be on of ['lobby', 'preparing', 'game', 'end']");
+            sender.sendMessage(messages.prefix("Phase must be on of ['lobby', 'preparing', 'game', 'end']"));
             return false;
         }
 

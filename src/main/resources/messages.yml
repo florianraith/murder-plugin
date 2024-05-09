@@ -1,0 +1,41 @@
+prefix: '<dark_gray>[<gray>Murder</gray>]</dark_gray> <reset>'
+
+vars:
+  seconds:
+    sg: 'second'
+    pl: 'seconds'
+
+lobby:
+  countdown: 'The game starts in <b><time></b> <verb>.'
+  not_enough_players: 'Not enough players to start the game.'
+
+preparing:
+  info:
+    - ''
+    - 'The preparing phase has started.'
+    - ''
+  countdown: 'The preparing phase ends in <b><time></b> <verb>.'
+  not_enough_players:
+    - 'Not enough players to start the game.'
+    - 'Returning to lobby...'
+
+end:
+  countdown: 'You are being teleported to the lobby in <b><time></b> <verb>.'
+
+game:
+  role:
+    murderer:
+      - ''
+      - 'You are the <b>murderer<b>.'
+      - 'Try to secretly kill all players.'
+      - ''
+    bystander:
+      - ''
+      - 'You are a <b>bystander</b>.'
+      - 'There is a murderer on the loose. Survive!'
+      - ''
+    spectator: 'You joined the game as spectator.'
+  win:
+    murderer: 'The murderer has won the game.'
+    bystander: 'The bystanders have won the game.'
+  killed: 'You have been killed by <b><killer></b>.'

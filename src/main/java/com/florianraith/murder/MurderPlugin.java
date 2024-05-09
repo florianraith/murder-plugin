@@ -1,8 +1,7 @@
 package com.florianraith.murder;
 
-import com.florianraith.murder.command.CommandExecutor;
-import com.florianraith.murder.command.CountdownCommand;
-import com.florianraith.murder.command.SwitchPhaseCommand;
+import com.florianraith.murder.command.*;
+import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.phase.LobbyPhase;
 import com.florianraith.murder.phase.WorldPhase;
 import com.google.inject.Guice;
@@ -11,12 +10,16 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
@@ -32,12 +35,16 @@ public class MurderPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        MurderPluginModule module = new MurderPluginModule(this);
+        Messages messages = new Messages();
+        messages.setConfig(loadConfig("messages.yml"));
+
+        MurderPluginModule module = new MurderPluginModule(this, messages);
         injector = Guice.createInjector(module);
         injector.injectMembers(this);
 
         registerCommand(SwitchPhaseCommand.class);
         registerCommand(CountdownCommand.class);
+        registerCommand(DisplayMessageCommand.class);
 
         registerEvents(WorldListener.class);
 
@@ -70,6 +77,15 @@ public class MurderPlugin extends JavaPlugin {
         return gameWorld;
     }
 
+    public FileConfiguration loadConfig(String name) {
+        File file = new File(getDataFolder(), name);
+        if (!file.exists()) {
+            saveResource(name, true);
+        }
+
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
     private void registerEvents(Class<? extends Listener> listenerClass) {
         Bukkit.getPluginManager().registerEvents(injector.getInstance(listenerClass), this);
     }
@@ -79,7 +95,15 @@ public class MurderPlugin extends JavaPlugin {
             Field nameField = commandClass.getField("NAME");
             String name = (String) nameField.get(null);
 
-            Objects.requireNonNull(getCommand(name)).setExecutor(injector.getInstance(commandClass));
+            PluginCommand command = Objects.requireNonNull(getCommand(name));
+            CommandExecutor executor = injector.getInstance(commandClass);
+
+            command.setExecutor(executor);
+
+            if (executor instanceof TabCompleter completer) {
+                command.setTabCompleter(completer);
+            }
+
             getLogger().info("Registered /" + name + " command");
         } catch (NoSuchFieldException e) {
             throw new IllegalStateException(commandClass.getSimpleName() + " must have a public static String NAME field");

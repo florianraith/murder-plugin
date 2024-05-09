@@ -1,5 +1,6 @@
 package com.florianraith.murder.phase;
 
+import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.MurderPlugin;
 import com.florianraith.murder.PlayerRole;
 import com.florianraith.murder.item.ItemManager;
@@ -7,6 +8,7 @@ import com.florianraith.murder.item.KnifeItem;
 import com.florianraith.murder.util.Attributes;
 import com.florianraith.murder.util.Worlds;
 import com.google.inject.Inject;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -20,6 +22,7 @@ public class GamePhase implements WorldPhase {
     @Inject private MurderPlugin plugin;
     @Inject private World world;
     @Inject private ItemManager itemManager;
+    @Inject private Messages messages;
 
     private final Map<Player, PlayerRole> roles = new HashMap<>();
 
@@ -55,14 +58,12 @@ public class GamePhase implements WorldPhase {
         List<Player> bystanders = getPlayers(PlayerRole.BYSTANDER);
 
         if (murderers.isEmpty()) {
-            Bukkit.broadcastMessage("The murderer has left the game.");
-            Bukkit.broadcastMessage("");
+            Bukkit.broadcast(messages.prefixed("game.left.murderer"));
             plugin.setPhase(new EndPhase());
         }
 
         if (bystanders.isEmpty()) {
-            Bukkit.broadcastMessage("The last bystander has left the game.");
-            Bukkit.broadcastMessage("");
+            Bukkit.broadcast(messages.prefixed("game.left.lastBystander"));
             plugin.setPhase(new EndPhase());
         }
     }
@@ -81,28 +82,24 @@ public class GamePhase implements WorldPhase {
 
     public void assignMurderer(Player player) {
         roles.put(player, PlayerRole.MURDERER);
-        player.sendMessage("");
-        player.sendMessage("You are the murderer.");
-        player.sendMessage("Try to secretly kill all players.");
-        player.sendMessage("");
-
+        player.sendMessage(messages.prefixed("game.role.murderer"));
         player.getInventory().addItem(itemManager.get(KnifeItem.class));
     }
 
     public void assignBystander(Player player) {
         roles.put(player, PlayerRole.BYSTANDER);
-        player.sendMessage("");
-        player.sendMessage("You are a bystander.");
-        player.sendMessage("There is a murderer on the lose. Survive!");
-        player.sendMessage("");
+        player.sendMessage(messages.prefixed("game.role.bystander"));
     }
 
     public void assignSpectator(Player player) {
         roles.put(player, PlayerRole.SPECTATOR);
-        player.sendMessage("");
-        player.sendMessage("You joined an ongoing game.");
-        player.sendMessage("");
+        player.sendMessage(messages.prefixed("game.role.spectator"));
+        player.setGameMode(GameMode.SPECTATOR);
+    }
 
+    public void killPlayer(Player player, Player killer) {
+        roles.put(player, PlayerRole.SPECTATOR);
+        player.sendMessage(messages.prefixed("game.killed", Placeholder.unparsed("killer", killer.getName())));
         player.setGameMode(GameMode.SPECTATOR);
     }
 
@@ -112,19 +109,13 @@ public class GamePhase implements WorldPhase {
         List<Player> spectators = getPlayers(PlayerRole.SPECTATOR);
 
         if (murderers.isEmpty()) {
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage("Congratulations!");
-            Bukkit.broadcastMessage("All murderers are dead");
-            Bukkit.broadcastMessage("");
+            Bukkit.broadcast(messages.prefixed("game.win.murderer"));
             plugin.setPhase(new EndPhase(spectators));
             return;
         }
 
         if (bystanders.isEmpty()) {
-            Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage("No bystander survived");
-            Bukkit.broadcastMessage("The murderer has won the game");
-            Bukkit.broadcastMessage("");
+            Bukkit.broadcast(messages.prefixed("game.win.bystander"));
             plugin.setPhase(new EndPhase(spectators));
             return;
         }

@@ -1,8 +1,10 @@
 package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
+import com.florianraith.murder.CountdownFactory;
 import com.florianraith.murder.Countdownable;
 import com.florianraith.murder.MurderPlugin;
+import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.util.Attributes;
 import com.google.inject.Inject;
 import lombok.Getter;
@@ -15,20 +17,18 @@ public class PreparingPhase implements WorldPhase, Countdownable {
 
     @Inject private MurderPlugin plugin;
     @Inject private World world;
+    @Inject private Messages messages;
+    @Inject private CountdownFactory countdownFactory;
 
     @Getter private Countdown countdown;
 
     @Override
     public void onEnable() {
         Bukkit.getOnlinePlayers().forEach(player -> player.teleport(world.getSpawnLocation()));
+        Bukkit.broadcast(messages.prefixed("preparing.info"));
 
-        countdown = new Countdown(plugin, () -> plugin.setPhase(new GamePhase()), 15);
-        countdown.setMessage("The preparing phase ends in %s");
-
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage("Prepare for the game");
-        Bukkit.broadcastMessage("");
-
+        countdown = countdownFactory.phase(GamePhase::new, 15);
+        countdown.setMessage("preparing.countdown");
         countdown.start();
     }
 
@@ -46,9 +46,7 @@ public class PreparingPhase implements WorldPhase, Countdownable {
     public void onQuit(Player player) {
         if (Bukkit.getOnlinePlayers().size() - 1 < LobbyPhase.MIN_PLAYERS) {
             countdown.stop();
-            Bukkit.broadcastMessage("Not enough players to start the game.");
-            Bukkit.broadcastMessage("Returning to lobby...");
-
+            Bukkit.broadcast(messages.prefixed("preparing.not_enough_players"));
             Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.setPhase(new LobbyPhase()), 20);
         }
     }

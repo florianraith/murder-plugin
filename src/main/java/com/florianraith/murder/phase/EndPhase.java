@@ -1,6 +1,7 @@
 package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
+import com.florianraith.murder.CountdownFactory;
 import com.florianraith.murder.Countdownable;
 import com.florianraith.murder.MurderPlugin;
 import com.google.inject.Inject;
@@ -20,6 +21,7 @@ public class EndPhase implements WorldPhase, Countdownable {
 
     @Inject private MurderPlugin plugin;
     @Inject private World world;
+    @Inject private CountdownFactory countdownFactory;
 
     @Getter private Countdown countdown;
 
@@ -29,8 +31,8 @@ public class EndPhase implements WorldPhase, Countdownable {
 
     @Override
     public void onEnable() {
-        countdown = new Countdown(plugin, () -> plugin.setPhase(new LobbyPhase()), 9);
-        countdown.setMessage("A new round starts in %s");
+        countdown = countdownFactory.phase(LobbyPhase::new, 9);
+        countdown.setMessage("end.countdown");
         countdown.start();
 
         spectators.forEach(spectator -> spectator.setGameMode(GameMode.SPECTATOR));

@@ -1,8 +1,10 @@
 package com.florianraith.murder.phase;
 
 import com.florianraith.murder.Countdown;
+import com.florianraith.murder.CountdownFactory;
 import com.florianraith.murder.Countdownable;
 import com.florianraith.murder.MurderPlugin;
+import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.item.ItemManager;
 import com.florianraith.murder.item.StartGameItem;
 import com.google.inject.Inject;
@@ -17,6 +19,8 @@ public class LobbyPhase implements WorldPhase, Countdownable {
 
     @Inject private MurderPlugin plugin;
     @Inject private ItemManager itemManager;
+    @Inject private Messages messages;
+    @Inject private CountdownFactory countdownFactory;
 
     private final World world;
     @Getter private Countdown countdown;
@@ -29,8 +33,8 @@ public class LobbyPhase implements WorldPhase, Countdownable {
     public void onEnable() {
         itemManager.register(StartGameItem.class);
 
-        countdown = new Countdown(plugin, () -> plugin.setPhase(new PreparingPhase()), 15);
-        countdown.setMessage("The game starts in %s");
+        countdown = countdownFactory.phase(PreparingPhase::new, 15);
+        countdown.setMessage("lobby.countdown");
 
         Bukkit.getOnlinePlayers().forEach(this::onJoin);
     }
@@ -56,7 +60,7 @@ public class LobbyPhase implements WorldPhase, Countdownable {
     public void onQuit(Player player) {
         if ((Bukkit.getOnlinePlayers().size() - 1) < MIN_PLAYERS && countdown.isRunning()) {
             countdown.stop();
-            Bukkit.broadcastMessage("Not enough players to start the game.");
+            Bukkit.broadcast(messages.prefixed("lobby.not_enough_players"));
         }
     }
 

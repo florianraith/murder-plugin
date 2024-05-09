@@ -1,7 +1,10 @@
 package com.florianraith.murder;
 
+import com.florianraith.murder.config.Messages;
+import com.google.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,14 +13,16 @@ import org.bukkit.scheduler.BukkitTask;
 @RequiredArgsConstructor
 public class Countdown {
 
-    private final JavaPlugin plugin;
+    @Inject private JavaPlugin plugin;
+    @Inject private Messages messages;
+
     private final Runnable runnable;
     private final long seconds;
 
     private BukkitTask task;
     private long countdown;
 
-    @Setter private String message = "Countdown ends in %s";
+    @Setter private String message = "countdown";
 
     public void start() {
         start(this.seconds);
@@ -37,9 +42,13 @@ public class Countdown {
             }
 
             if (countdown % 5 == 0 || countdown <= 5) {
-                String verb = countdown == 1 ? " second" : " seconds";
+                String verb = messages.raw("vars.seconds." + (countdown == 1 ? "sg" : "pl"));
 
-                Bukkit.broadcastMessage(String.format(message, countdown + verb));
+                Bukkit.broadcast(messages.prefixed(
+                        message,
+                        Placeholder.unparsed("time", String.valueOf(countdown)),
+                        Placeholder.unparsed("verb", verb)
+                ));
                 Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1));
             }
 
@@ -62,4 +71,5 @@ public class Countdown {
     public boolean isRunning() {
         return !isStopped();
     }
+
 }
