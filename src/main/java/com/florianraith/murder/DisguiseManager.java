@@ -137,7 +137,7 @@ public class DisguiseManager {
 
         PacketContainer respawnPacket = new PacketContainer(PacketType.Play.Server.RESPAWN);
         InternalStructure playerSpawnInfo = respawnPacket.getStructures().read(0);
-        playerSpawnInfo.getModifier().withType(MinecraftReflection.getResourceKey(), ResourceKey.CONVERTER).write(0, new ResourceKey(new MinecraftKey("minecraft", "dimension_type"), new MinecraftKey("minecraft", "overworld")));
+        playerSpawnInfo.getModifier().withType(MinecraftReflection.getResourceKey(), ResourceKey.CONVERTER).write(0, new ResourceKey(new MinecraftKey("minecraft", "dimension_type"), new MinecraftKey("minecraft", "normal")));
         playerSpawnInfo.getWorldKeys().write(0, target.getWorld());
         playerSpawnInfo.getLongs().write(0, Hashing.sha256().hashLong(target.getWorld().getSeed()).asLong());
         playerSpawnInfo.getGameModes().write(0, EnumWrappers.NativeGameMode.fromBukkit(target.getGameMode()));

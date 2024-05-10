@@ -6,10 +6,7 @@ import com.florianraith.murder.MurderPlugin;
 import com.florianraith.murder.config.Messages;
 import com.google.inject.Inject;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.annotation.command.Command;
-import org.bukkit.plugin.java.annotation.command.Commands;
 
-@Commands(@Command(name = CountdownCommand.NAME))
 public class CountdownCommand implements CommandExecutor {
 
     public static final String NAME = "countdown";
@@ -22,7 +19,7 @@ public class CountdownCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, String label, String[] args) {
         if (!(plugin.getCurrentPhase() instanceof Countdownable countdownable)) {
             sender.sendMessage(messages.prefix("This phase doesn't have a countdown"));
-            return false;
+            return true;
         }
 
         Countdown countdown = countdownable.getCountdown();
@@ -34,18 +31,18 @@ public class CountdownCommand implements CommandExecutor {
                 seconds = Long.parseLong(args[0]);
             } catch (NumberFormatException e) {
                 sender.sendMessage(messages.prefix("The first argument has to be a number"));
-                return false;
+                return true;
             }
 
             if (seconds < 0) {
                 sender.sendMessage(messages.prefix("The number has to be positive"));
-                return false;
+                return true;
             }
 
             countdown.stop();
             countdown.start(seconds);
             sender.sendMessage(messages.prefix("Countdown started with " + seconds + " seconds"));
-            return false;
+            return true;
         }
 
 
@@ -57,6 +54,6 @@ public class CountdownCommand implements CommandExecutor {
             sender.sendMessage(messages.prefix("Countdown started"));
         }
 
-        return false;
+        return true;
     }
 }
