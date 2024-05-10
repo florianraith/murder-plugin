@@ -3,7 +3,6 @@ package com.florianraith.murder;
 import com.comphenix.packetwrapper.wrappers.ResourceKey;
 import com.comphenix.packetwrapper.wrappers.WrapperPlayServerPlayerInfo;
 import com.comphenix.packetwrapper.wrappers.WrapperPlayServerPlayerInfoRemove;
-import com.comphenix.packetwrapper.wrappers.WrapperPlayServerRespawn;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.*;
@@ -13,8 +12,11 @@ import com.florianraith.murder.config.Messages;
 import com.google.common.hash.Hashing;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -68,19 +70,6 @@ public class DisguiseManager {
         };
 
         protocolManager.addPacketListener(adapter);
-
-        protocolManager.addPacketListener(new PacketAdapter(
-                plugin,
-                WrapperPlayServerRespawn.TYPE
-        ) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                if (event.getPacketType() == WrapperPlayServerPlayerInfo.TYPE) {
-                    WrapperPlayServerPlayerInfo packet = new WrapperPlayServerPlayerInfo(event.getPacket());
-                    System.out.println("to " + event.getPlayer().getName() + ": " + packet);
-                }
-            }
-        });
     }
 
     public void requestDisguise(Player player, String name) {
@@ -111,8 +100,14 @@ public class DisguiseManager {
                 .map(Bukkit::getPlayer)
                 .filter(Objects::nonNull)
                 .forEach(this::reset);
-
         fakedData.clear();
+    }
+
+    public void disable() {
+        protocolManager.removePacketListener(adapter);
+        resetAll();
+        originalData.clear();
+        requests.clear();
     }
 
     private PlayerInfoData fakePlayerData(PlayerInfoData original, String name) {
@@ -128,17 +123,55 @@ public class DisguiseManager {
         );
     }
 
+    /**
+     * Send all packets necessary to update the player's name and skin
+     */
     private void sendPackets(Player target, PlayerInfoData data) {
         Location location = target.getLocation();
         boolean flying = target.isFlying();
 
-        WrapperPlayServerPlayerInfoRemove removePacket = new WrapperPlayServerPlayerInfoRemove();
-        removePacket.setProfileIds(List.of(data.getProfileId()));
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.hidePlayer(plugin, target);
+        }
 
+        sendRemovePacket(target);
+
+        // This is necessary so the player can see its own updated skin
+        sendRespawnPacket(target);
+
+        // The respawn packet causes the player to teleport to the world spawn,
+        // so we teleport the player back to its original location
+        target.teleport(location);
+
+        // Without this the player gets a very long "Loading terrain..." screen
+        // I honestly don't know what it does, but it works
+        updateLevelInfo(target);
+
+        sendInfoPacket(EnumWrappers.PlayerInfoAction.ADD_PLAYER, data);
+        sendInfoPacket(EnumWrappers.PlayerInfoAction.UPDATE_LISTED, data);
+
+        target.updateInventory();
+        target.setFlying(flying);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.showPlayer(plugin, target);
+        }
+    }
+
+    private void sendRemovePacket(Player target) {
+        WrapperPlayServerPlayerInfoRemove removePacket = new WrapperPlayServerPlayerInfoRemove();
+        removePacket.setProfileIds(List.of(target.getUniqueId()));
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            protocolManager.sendServerPacket(player, removePacket.getHandle());
+        }
+    }
+
+    private void sendRespawnPacket(Player target) {
         PacketContainer respawnPacket = new PacketContainer(PacketType.Play.Server.RESPAWN);
         InternalStructure playerSpawnInfo = respawnPacket.getStructures().read(0);
-        playerSpawnInfo.getModifier().withType(MinecraftReflection.getResourceKey(), ResourceKey.CONVERTER).write(0, new ResourceKey(new MinecraftKey("minecraft", "dimension_type"), new MinecraftKey("minecraft", "normal")));
-        playerSpawnInfo.getWorldKeys().write(0, target.getWorld());
+        playerSpawnInfo.getModifier().withType(MinecraftReflection.getResourceKey(), ResourceKey.CONVERTER).write(0, new ResourceKey(new MinecraftKey("minecraft", "dimension_type"), new MinecraftKey("minecraft", "overworld")));
+        playerSpawnInfo.getModifier().withType(MinecraftReflection.getResourceKey(), ResourceKey.CONVERTER).write(1, new ResourceKey(new MinecraftKey("minecraft", "dimension"), new MinecraftKey("minecraft", "overworld")));
         playerSpawnInfo.getLongs().write(0, Hashing.sha256().hashLong(target.getWorld().getSeed()).asLong());
         playerSpawnInfo.getGameModes().write(0, EnumWrappers.NativeGameMode.fromBukkit(target.getGameMode()));
         playerSpawnInfo.getGameModes().write(1, EnumWrappers.NativeGameMode.fromBukkit(target.getGameMode()));
@@ -149,36 +182,26 @@ public class DisguiseManager {
         respawnPacket.getStructures().write(0, playerSpawnInfo);
         respawnPacket.getBytes().write(0, (byte) 3);
 
-        System.out.println("sending disguise packets to " + target.getName());
-
-        protocolManager.sendServerPacket(target, removePacket.getHandle());
         protocolManager.sendServerPacket(target, respawnPacket);
-        protocolManager.sendServerPacket(target, infoPacket(EnumWrappers.PlayerInfoAction.ADD_PLAYER, data));
-        protocolManager.sendServerPacket(target, infoPacket(EnumWrappers.PlayerInfoAction.UPDATE_LISTED, data));
-
-        target.updateInventory();
-        target.teleport(location);
-        target.setFlying(flying);
-
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.hidePlayer(plugin, target);
-            player.showPlayer(plugin, target);
-        }
     }
 
-    private PacketContainer infoPacket(EnumWrappers.PlayerInfoAction action, PlayerInfoData data) {
+    private void sendInfoPacket(EnumWrappers.PlayerInfoAction action, PlayerInfoData data) {
         WrapperPlayServerPlayerInfo addPacket = new WrapperPlayServerPlayerInfo();
         addPacket.setActions(Set.of(action));
         addPacket.setEntries(List.of(data));
-        return addPacket.getHandle();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            protocolManager.sendServerPacket(player, addPacket.getHandle());
+        }
     }
 
-    public void disable() {
-        protocolManager.removePacketListener(adapter);
-        resetAll();
-        originalData.clear();
-        requests.clear();
-    }
+    // TODO: avoid nms
+    private void updateLevelInfo(Player player) {
+        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+        MinecraftServer server = serverPlayer.getServer();
 
+        if (server != null) {
+            server.getPlayerList().sendLevelInfo(serverPlayer, serverPlayer.serverLevel());
+        }
+    }
 }

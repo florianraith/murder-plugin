@@ -17,6 +17,11 @@ public class ToggleDisguiseCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, String label, String[] args) {
 
+        if (args.length > 0) {
+            disguiseManager.requestDisguise((Player) sender, args[0]);
+            return true;
+        }
+
         if (!toggled) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 disguiseManager.requestDisguise(player, "D_" + player.getName());
@@ -26,14 +31,6 @@ public class ToggleDisguiseCommand implements CommandExecutor {
         }
 
         toggled = !toggled;
-
-
-//        Disguise disguise = Disguise.builder()
-//                .setName("D_" + sender.getName())
-//                .setSkin("Steve")
-//                .build();
-//
-//        dev.iiahmed.disguise.DisguiseManager.getProvider().disguise((Player) sender, disguise);
 
         return true;
     }
