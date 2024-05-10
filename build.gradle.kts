@@ -12,11 +12,13 @@ repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.dmulloy2.net/repository/public/")
+    maven("https://repo.gravemc.net/releases/")
 }
 
 dependencies {
     implementation("com.google.inject:guice:7.0.0")
     implementation("com.google.guava:guava:33.2.0-jre")
+    implementation("dev.iiahmed:ModernDisguise:2.8")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
 
     paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")

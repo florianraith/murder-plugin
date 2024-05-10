@@ -14,9 +14,15 @@ public interface WorldPhase {
         player.setHealth(Attributes.reset(player, Attribute.GENERIC_MAX_HEALTH));
     }
 
-    void onEnable();
+    /**
+     * @param previous previous phase; null if this is the first phase
+     */
+    void onEnable(WorldPhase previous);
 
-    void onDisable();
+    /**
+     * @param next next phase; null if this is the last phase
+     */
+    void onDisable(WorldPhase next);
 
     void onJoin(Player player);
 

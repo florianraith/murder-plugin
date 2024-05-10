@@ -30,7 +30,7 @@ public class EndPhase implements WorldPhase, Countdownable {
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable(WorldPhase previous) {
         countdown = countdownFactory.phase(LobbyPhase::new, 9);
         countdown.setMessage("end.countdown");
         countdown.start();
@@ -39,7 +39,7 @@ public class EndPhase implements WorldPhase, Countdownable {
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable(WorldPhase next) {
         countdown.stop();
     }
 

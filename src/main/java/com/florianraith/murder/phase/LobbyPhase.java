@@ -30,7 +30,7 @@ public class LobbyPhase implements WorldPhase, Countdownable {
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable(WorldPhase previous) {
         itemManager.register(StartGameItem.class);
 
         countdown = countdownFactory.phase(PreparingPhase::new, 15);
@@ -40,7 +40,7 @@ public class LobbyPhase implements WorldPhase, Countdownable {
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable(WorldPhase next) {
         itemManager.unregisterAll();
         countdown.stop();
     }

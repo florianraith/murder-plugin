@@ -1,9 +1,6 @@
 package com.florianraith.murder.phase;
 
-import com.florianraith.murder.Countdown;
-import com.florianraith.murder.CountdownFactory;
-import com.florianraith.murder.Countdownable;
-import com.florianraith.murder.MurderPlugin;
+import com.florianraith.murder.*;
 import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.util.Attributes;
 import com.google.inject.Inject;
@@ -21,25 +18,33 @@ public class PreparingPhase implements WorldPhase, Countdownable {
     @Inject private CountdownFactory countdownFactory;
 
     @Getter private Countdown countdown;
+    @Getter private Disguises disguises;
 
     @Override
-    public void onEnable() {
+    public void onEnable(WorldPhase previous) {
         Bukkit.getOnlinePlayers().forEach(player -> player.teleport(world.getSpawnLocation()));
         Bukkit.broadcast(messages.prefixed("preparing.info"));
 
         countdown = countdownFactory.phase(GamePhase::new, 15);
         countdown.setMessage("preparing.countdown");
         countdown.start();
+
+        disguises = Disguises.create(Bukkit.getOnlinePlayers());
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable(WorldPhase next) {
         countdown.stop();
+
+        if (!(next instanceof GamePhase)) {
+            disguises.undisguiseAll();
+        }
     }
 
     @Override
     public void onJoin(Player player) {
         player.teleport(world.getSpawnLocation());
+        disguises.disguise(player);
     }
 
     @Override

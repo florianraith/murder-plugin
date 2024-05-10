@@ -1,6 +1,7 @@
 package com.florianraith.murder.phase;
 
 import com.florianraith.murder.BossBars;
+import com.florianraith.murder.Disguises;
 import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.MurderPlugin;
 import com.florianraith.murder.PlayerRole;
@@ -28,24 +29,33 @@ public class GamePhase implements WorldPhase {
     @Inject private BossBars bossBars;
 
     private final Map<Player, PlayerRole> roles = new HashMap<>();
+    private Disguises disguises;
 
     @Override
-    public void onEnable() {
+    public void onEnable(WorldPhase previous) {
         itemManager.register(KnifeItem.class);
 
         List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
         Worlds.ensurePlayersAreInWorld(players, world);
         Collections.shuffle(players);
 
+        if (previous instanceof PreparingPhase preparing) {
+            disguises = preparing.getDisguises();
+        } else {
+            disguises = Disguises.create(players);
+        }
+
         assignMurderer(players.removeFirst());
         players.forEach(this::assignBystander);
+
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable(WorldPhase next) {
         bossBars.clearAll();
         itemManager.unregisterAll();
         roles.clear();
+        disguises.undisguiseAll();
     }
 
     @Override
@@ -108,6 +118,7 @@ public class GamePhase implements WorldPhase {
     }
 
     public void killPlayer(Player player, Player killer) {
+        disguises.undisguise(player);
         assignSpectator(player);
         player.sendMessage(messages.prefixed("game.killed", Placeholder.unparsed("killer", killer.getName())));
     }

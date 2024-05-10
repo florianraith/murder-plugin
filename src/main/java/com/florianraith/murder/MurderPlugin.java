@@ -6,6 +6,7 @@ import com.florianraith.murder.phase.LobbyPhase;
 import com.florianraith.murder.phase.WorldPhase;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import dev.iiahmed.disguise.DisguiseManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -36,6 +37,8 @@ public class MurderPlugin extends JavaPlugin {
         injector = Guice.createInjector(module);
         injector.injectMembers(this);
 
+        DisguiseManager.setPlugin(this);
+
         registerCommand(SwitchPhaseCommand.class);
         registerCommand(CountdownCommand.class);
         registerCommand(DisplayMessageCommand.class);
@@ -48,7 +51,7 @@ public class MurderPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         if (currentPhase != null) {
-            currentPhase.onDisable();
+            currentPhase.onDisable(null);
         }
     }
 
@@ -56,12 +59,13 @@ public class MurderPlugin extends JavaPlugin {
         injector.injectMembers(phase);
 
         if (currentPhase != null) {
-            currentPhase.onDisable();
+            currentPhase.onDisable(phase);
         }
 
+        WorldPhase previousPhase = currentPhase;
         currentPhase = phase;
         Bukkit.getOnlinePlayers().forEach(phase::preparePlayer);
-        phase.onEnable();
+        phase.onEnable(previousPhase);
     }
 
     public World getGameWorld() {
