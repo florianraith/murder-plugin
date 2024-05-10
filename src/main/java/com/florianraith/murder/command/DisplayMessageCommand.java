@@ -4,8 +4,6 @@ import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.MurderPlugin;
 import com.google.inject.Inject;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.annotation.command.Command;
-import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.util.StringUtil;
 
 import java.io.File;
@@ -13,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Commands(@Command(name = DisplayMessageCommand.NAME))
 public class DisplayMessageCommand implements CommandExecutor, TabCompleter {
 
     public static final String NAME = "message";
@@ -24,24 +21,24 @@ public class DisplayMessageCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, String label, String[] args) {
         if (args.length < 1) {
-            return false;
+            return true;
         }
 
         if (args[0].equalsIgnoreCase("reload")) {
             messages.setConfig(plugin.loadConfig("messages.yml"));
             sender.sendMessage(messages.prefix("Reloaded messages"));
-            return false;
+            return true;
         }
 
         if (args[0].equalsIgnoreCase("reset")) {
             new File(plugin.getDataFolder(), "messages.yml").delete();
             messages.setConfig(plugin.loadConfig("messages.yml"));
             sender.sendMessage(messages.prefix("Reset messages"));
-            return false;
+            return true;
         }
 
         sender.sendMessage(messages.prefixed(args[0]));
-        return false;
+        return true;
     }
 
     @Override

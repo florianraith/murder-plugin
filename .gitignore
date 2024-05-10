@@ -1,6 +1,7 @@
 spigot/
 paper/
 target/
+.gradle
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

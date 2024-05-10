@@ -1,0 +1,17 @@
+name: Murder
+version: 1.0
+author: Florian Raith
+main: com.florianraith.murder.MurderPlugin
+api-version: 1.20
+depend:
+  - ProtocolLib
+
+commands:
+  message:
+    usage: /message
+  phase:
+    usage: /phase
+  countdown:
+    usage: /countdown
+  disguise:
+    usage: /disguise

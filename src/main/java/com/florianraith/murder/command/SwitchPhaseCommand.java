@@ -5,10 +5,7 @@ import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.phase.*;
 import com.google.inject.Inject;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.annotation.command.Command;
-import org.bukkit.plugin.java.annotation.command.Commands;
 
-@Commands(@Command(name = SwitchPhaseCommand.NAME))
 public class SwitchPhaseCommand implements CommandExecutor {
 
     public static final String NAME = "phase";
@@ -20,7 +17,7 @@ public class SwitchPhaseCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, String label, String[] args) {
         if (args.length < 1) {
             sender.sendMessage(messages.prefix("Phase must be on of ['lobby', 'preparing', 'game', 'end']"));
-            return false;
+            return true;
         }
 
         WorldPhase phase = switch (args[0]) {
@@ -33,10 +30,10 @@ public class SwitchPhaseCommand implements CommandExecutor {
 
         if (phase == null) {
             sender.sendMessage(messages.prefix("Phase must be on of ['lobby', 'preparing', 'game', 'end']"));
-            return false;
+            return true;
         }
 
         plugin.setPhase(phase);
-        return false;
+        return true;
     }
 }

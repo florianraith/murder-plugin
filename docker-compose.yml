@@ -5,7 +5,6 @@ services:
     ports:
       - "25565:25565"
     volumes:
-#      - ./spigot:/var/spigot
       - ./paper:/var/paper
     stdin_open: true
     tty: true

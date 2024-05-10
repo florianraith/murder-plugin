@@ -15,17 +15,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
-import org.bukkit.plugin.java.annotation.plugin.Plugin;
-import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-@Plugin(name = "Murder", version = "1.0")
-@Author("Florian Raith")
-@ApiVersion(ApiVersion.Target.v1_20)
 @Getter
 public class MurderPlugin extends JavaPlugin {
 
