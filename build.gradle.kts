@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("io.freefair.lombok") version "8.6"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.papermc.paperweight.userdev") version "1.7.0"
 }
 
 group = "com.florianraith"
@@ -16,8 +17,9 @@ repositories {
 dependencies {
     implementation("com.google.inject:guice:7.0.0")
     implementation("com.google.guava:guava:33.2.0-jre")
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
+
+    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
 }
 
 java {
@@ -28,12 +30,17 @@ tasks.shadowJar {
     archiveClassifier.set("")
 }
 
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
+    dependsOn(tasks.reobfJar)
+}
+
 val copyJarToPlugins by tasks.registering(Copy::class) {
     from("build/libs/")
-    include("*.jar")
+    include("*SNAPSHOT.jar")
     into("paper/plugins/")
 }
 
-tasks.named("shadowJar") {
+tasks.named("assemble") {
     finalizedBy(copyJarToPlugins)
 }
