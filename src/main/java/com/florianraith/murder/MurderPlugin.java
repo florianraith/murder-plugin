@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
@@ -26,6 +27,7 @@ import java.util.Objects;
 @Plugin(name = "Murder", version = "1.0")
 @Author("Florian Raith")
 @ApiVersion(ApiVersion.Target.v1_20)
+@Dependency("ProtocolLib")
 @Getter
 public class MurderPlugin extends JavaPlugin {
 
@@ -33,8 +35,12 @@ public class MurderPlugin extends JavaPlugin {
     private WorldPhase currentPhase;
     private World gameWorld;
 
+    private DisguiseManager disguiseManager;
+
     @Override
     public void onEnable() {
+        dev.iiahmed.disguise.DisguiseManager.setPlugin(this);
+
         Messages messages = new Messages();
         messages.setConfig(loadConfig("messages.yml"));
 
@@ -45,10 +51,14 @@ public class MurderPlugin extends JavaPlugin {
         registerCommand(SwitchPhaseCommand.class);
         registerCommand(CountdownCommand.class);
         registerCommand(DisplayMessageCommand.class);
+        registerCommand(ToggleDisguiseCommand.class);
 
         registerEvents(WorldListener.class);
 
         setPhase(new LobbyPhase());
+
+        disguiseManager = injector.getInstance(DisguiseManager.class);
+        disguiseManager.enable();
     }
 
     @Override
@@ -56,6 +66,8 @@ public class MurderPlugin extends JavaPlugin {
         if (currentPhase != null) {
             currentPhase.onDisable();
         }
+
+        disguiseManager.disable();
     }
 
     public void setPhase(WorldPhase phase) {

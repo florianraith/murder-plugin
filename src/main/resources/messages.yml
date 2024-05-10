@@ -22,11 +22,16 @@ preparing:
 end:
   countdown: 'You are being teleported to the lobby in <b><time></b> <verb>.'
 
+roles:
+  murderer: '<red>Murderer'
+  bystander: '<yellow>Bystander'
+  spectator: '<white>Spectator'
+
 game:
   role:
     murderer:
       - ''
-      - 'You are the <b>murderer<b>.'
+      - 'You are the <b>murderer</b>.'
       - 'Try to secretly kill all players.'
       - ''
     bystander:

@@ -1,5 +1,7 @@
 package com.florianraith.murder;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.phase.*;
 import com.google.inject.AbstractModule;
@@ -19,6 +21,7 @@ public class MurderPluginModule extends AbstractModule {
         bind(JavaPlugin.class).toInstance(plugin);
         bind(Messages.class).toInstance(messages);
         bind(World.class).toProvider(plugin::getGameWorld);
+        bind(ProtocolManager.class).toProvider(ProtocolLibrary::getProtocolManager);
         bindPhase(LobbyPhase.class);
         bindPhase(PreparingPhase.class);
         bindPhase(GamePhase.class);

@@ -1,9 +1,6 @@
 package com.florianraith.murder.phase;
 
-import com.florianraith.murder.Countdown;
-import com.florianraith.murder.CountdownFactory;
-import com.florianraith.murder.Countdownable;
-import com.florianraith.murder.MurderPlugin;
+import com.florianraith.murder.*;
 import com.florianraith.murder.config.Messages;
 import com.florianraith.murder.item.ItemManager;
 import com.florianraith.murder.item.StartGameItem;
@@ -21,6 +18,7 @@ public class LobbyPhase implements WorldPhase, Countdownable {
     @Inject private ItemManager itemManager;
     @Inject private Messages messages;
     @Inject private CountdownFactory countdownFactory;
+    @Inject private DisguiseManager disguiseManager;
 
     private final World world;
     @Getter private Countdown countdown;
@@ -43,6 +41,7 @@ public class LobbyPhase implements WorldPhase, Countdownable {
     public void onDisable() {
         itemManager.unregisterAll();
         countdown.stop();
+        disguiseManager.resetAll();
     }
 
     @Override
